@@ -7,7 +7,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { EnvVariables } from '../../config/types/env-variables.type';
+import { EnvVariables } from '../config/types/env-variables.type';
 import { IS3Provider } from './s3.provider';
 
 @Injectable()
