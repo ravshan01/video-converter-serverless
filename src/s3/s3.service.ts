@@ -8,9 +8,10 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { EnvVariables } from '../../config/types/env-variables.type';
+import { IS3Provider } from './s3.provider';
 
 @Injectable()
-export class S3Service {
+export class S3Service implements IS3Provider {
   private client: S3Client;
 
   constructor(private readonly configService: ConfigService<EnvVariables>) {
