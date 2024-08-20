@@ -23,20 +23,16 @@ export class VideoService implements IVideoProvider {
       video instanceof Readable ? video : bufferToStream(Buffer.from(video));
     const passThrough = new PassThrough();
 
-    const command = ffmpeg(stream).outputOptions(
-      [
-        // '-qscale:v 4',
-        `-f ${options.container}`,
-        options.codec ? `-vcodec ${options.codec}` : '',
-        options.audioCodec ? `-acodec ${options.audioCodec}` : '',
-        options.size ? `-s ${options.size}` : '',
-        options.bitrate ? `-b:v ${options.bitrate}` : '',
-        options.fps ? `-r ${options.fps}` : '',
-        options.preset ? `-preset ${options.preset}` : '',
-        '-movflags +faststart', // moves file metadata to the beginning of the file
-      ].filter(Boolean),
-    );
+    const outputOptions = [`-f ${options.container}`, '-movflags +faststart'];
+    if (options.codec) outputOptions.push(`-vcodec ${options.codec}`);
+    if (options.audioCodec) outputOptions.push(`-acodec ${options.audioCodec}`);
+    if (options.size) outputOptions.push(`-s ${options.size}`);
+    if (options.bitrate) outputOptions.push(`-b:v ${options.bitrate}`);
+    if (options.fps) outputOptions.push(`-r ${options.fps}`);
+    if (options.preset) outputOptions.push(`-preset ${options.preset}`);
+    if (options.crf) outputOptions.push(`-crf ${options.crf}`);
 
+    const command = ffmpeg(stream).outputOptions(outputOptions);
     command.pipe(passThrough, { end: true });
 
     return passThrough;
