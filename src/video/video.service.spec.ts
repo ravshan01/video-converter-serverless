@@ -33,7 +33,7 @@ describe('VideoService', () => {
       }
     });
 
-    it('should return false if the path is not a video extension', async () => {
+    it('should return false if the path is not a video extension', () => {
       const incorrectPaths = [
         'test.txt',
         'test.jpg',
@@ -45,7 +45,7 @@ describe('VideoService', () => {
       ];
 
       for (const path of incorrectPaths) {
-        const result = await service.isVideoExtension(path);
+        const result = service.isVideoExtension(path);
         expect(result).toBe(false);
       }
     });
