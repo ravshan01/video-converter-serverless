@@ -16,6 +16,7 @@ export class S3Service implements IS3Provider {
 
   constructor(private readonly configService: ConfigService<EnvVariables>) {
     this.client = new S3Client({
+      endpoint: this.configService.get('YC_S3_ENDPOINT'),
       region: this.configService.get('YC_REGION'),
       credentials: {
         accessKeyId: this.configService.get('YC_ACCESS_KEY_ID'),
