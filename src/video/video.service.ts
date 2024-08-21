@@ -39,6 +39,9 @@ export class VideoService implements IVideoProvider {
       command.inputOptions(`-probesize ${options.probeSize}`);
 
     command.format(options.container); // -f ${options.container}
+    // 'frag_keyframe' allows fragmented output &
+    // 'empty_moov' will cause output to be 100% fragmented; without this the first fragment will be muxed as a short movie (using moov) followed by the rest of the media in fragments.
+    // 'faststart' will move the moov atom to the beginning of the file, which allows you to play a video before it is completely downloaded
     command.outputOptions(['-movflags frag_keyframe+empty_moov+faststart']);
     if (options.codec) command.videoCodec(options.codec); // -vcodec ${options.codec}
     if (options.audioCodec) command.audioCodec(options.audioCodec); // -acodec ${options.audioCodec}
