@@ -35,7 +35,6 @@ export class VideoService implements IVideoProvider {
     if (options.crf) outputOptions.push(`-crf ${options.crf}`);
 
     const command = ffmpeg(stream).outputOptions(outputOptions);
-
     command.pipe(passThrough, { end: true });
 
     return passThrough;
