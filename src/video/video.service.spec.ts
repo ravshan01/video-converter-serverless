@@ -93,7 +93,7 @@ describe('VideoService', () => {
         probeSize: 2147483647,
       };
 
-      const stream = service.convert(buffer, options, false);
+      const stream = service.convert(buffer, options, true);
       expect(stream).toBeDefined();
       expect(stream).toBeInstanceOf(Readable);
 
