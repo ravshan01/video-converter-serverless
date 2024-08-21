@@ -57,6 +57,7 @@ export class VideoService implements IVideoProvider {
     if (options.fps) outputOptions.push(`-r ${options.fps}`);
     if (options.preset) outputOptions.push(`-preset ${options.preset}`);
     if (options.crf) outputOptions.push(`-crf ${options.crf}`);
+    if (options.pixFmt) outputOptions.push(`-pix_fmt ${options.pixFmt}`);
 
     const command = ffmpeg(stream)
       .inputOptions(inputOptions)
