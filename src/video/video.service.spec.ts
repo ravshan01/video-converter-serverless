@@ -1,5 +1,5 @@
 import { createWriteStream } from 'node:fs';
-import { readFile } from 'node:fs/promises';
+import { stat } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { Readable } from 'node:stream';
 
@@ -76,9 +76,12 @@ describe('VideoService', () => {
       },
     };
 
-    it('should convert the video', async () => {
+    it.todo('should convert and optimize the video from Readable');
+    it.todo('should convert and optimize the video from Buffer');
+    it.todo('should convert and optimize the video from ArrayBuffer');
+    it.todo('should convert and optimize the video from Uint8Array');
+    it('should convert and optimize the video from string(path)', async () => {
       const mockVideo = MOCK_VIDEOS.WithAudio.MP4;
-      const buffer = await readFile(mockVideo.path);
       const container = 'mp4';
       const options: IVideoProviderConvertOptions = {
         container,
@@ -89,11 +92,9 @@ describe('VideoService', () => {
         preset: 'slow',
         fps: 20,
         // bitrate: '1M',
-        analyzeDuration: 2147483647,
-        probeSize: 2147483647,
       };
 
-      const stream = service.convert(buffer, options, true);
+      const stream = service.convert(mockVideo.path, options, true);
       expect(stream).toBeDefined();
       expect(stream).toBeInstanceOf(Readable);
 
@@ -105,10 +106,11 @@ describe('VideoService', () => {
 
       const output = createWriteStream(outputPath);
       stream.pipe(output);
-
       await new Promise((resolve) => output.on('finish', resolve));
+
+      const stats = await stat(mockVideo.path);
       expect(output.bytesWritten).toBeGreaterThan(0);
-      expect(output.bytesWritten).toBeLessThan(buffer.byteLength);
+      expect(output.bytesWritten).toBeLessThan(stats.size);
     }, 60000);
   });
 });
