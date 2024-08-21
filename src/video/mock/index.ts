@@ -1,13 +1,17 @@
 import { join } from 'node:path';
 
-export const MOCK_VIDEOS = [
-  {
-    path: join(__dirname, 'air.mp4'),
+export const MOCK_VIDEOS = {
+  WithoutAudio: {
+    MP4: {
+      path: join(__dirname, 'video-without-audio.mp4'),
+    },
+    WebM: {
+      path: join(__dirname, 'video-without-audio.webm'),
+    },
   },
-  {
-    path: join(__dirname, 'field.mp4'),
+  WithAudio: {
+    MP4: {
+      path: join(__dirname, 'video-with-audio.mp4'),
+    },
   },
-  {
-    path: join(__dirname, 'street.mp4'),
-  },
-];
+};
