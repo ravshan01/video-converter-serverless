@@ -31,36 +31,24 @@ export class VideoService implements IVideoProvider {
   ): Readable {
     const input = this.getCorrectFfmpegVideoInput(video);
     const passThrough = new PassThrough();
+    const command = ffmpeg(input);
 
-    const inputOptions = [];
     if (options.analyzeDuration)
-      inputOptions.push(`-analyzeduration ${options.analyzeDuration}`);
-    if (options.probeSize) inputOptions.push(`-probesize ${options.probeSize}`);
+      command.inputOptions(`-analyzeduration ${options.analyzeDuration}`);
+    if (options.probeSize)
+      command.inputOptions(`-probesize ${options.probeSize}`);
 
-    const outputOptions = [
-      `-f ${options.container}`,
-      // '-movflags +faststart',
-
-      // 'frag_keyframe', 'empty_moov' for fix output stream video
-      // 'frag_keyframe' allows fragmented output &
-      // 'empty_moov' will cause output to be 100% fragmented; without this the first fragment will be muxed as a short movie (using moov) followed by the rest of the media in fragments.
-      // 'faststart' will move the moov atom to the beginning of the file, which allows you to play a video before it is completely downloaded
-      '-movflags frag_keyframe+empty_moov+faststart',
-    ];
-    if (options.codec) outputOptions.push(`-vcodec ${options.codec}`);
-    if (options.audioCodec) outputOptions.push(`-acodec ${options.audioCodec}`);
-    if (options.bitrate) outputOptions.push(`-b:v ${options.bitrate}`);
-    if (options.audioBitrate)
-      outputOptions.push(`-b:a ${options.audioBitrate}`);
-    if (options.size) outputOptions.push(`-s ${options.size}`);
-    if (options.fps) outputOptions.push(`-r ${options.fps}`);
-    if (options.preset) outputOptions.push(`-preset ${options.preset}`);
-    if (options.crf) outputOptions.push(`-crf ${options.crf}`);
-    if (options.pixFmt) outputOptions.push(`-pix_fmt ${options.pixFmt}`);
-
-    const command = ffmpeg(input)
-      .inputOptions(inputOptions)
-      .outputOptions(outputOptions);
+    command.format(options.container); // -f ${options.container}
+    command.outputOptions(['-movflags frag_keyframe+empty_moov+faststart']);
+    if (options.codec) command.videoCodec(options.codec); // -vcodec ${options.codec}
+    if (options.audioCodec) command.audioCodec(options.audioCodec); // -acodec ${options.audioCodec}
+    if (options.bitrate) command.videoBitrate(options.bitrate); // -b:v ${options.bitrate}
+    if (options.audioBitrate) command.audioBitrate(options.audioBitrate); // -b:a ${options.audioBitrate}
+    if (options.size) command.size(options.size); // -s ${options.size}
+    if (options.fps) command.fps(options.fps); // -r ${options.fps}
+    if (options.preset) command.outputOption(`-preset ${options.preset}`);
+    if (options.crf) command.outputOption(`-crf ${options.crf}`);
+    if (options.pixFmt) command.outputOption(`-pix_fmt ${options.pixFmt}`);
 
     this.addLogsOnCommand(command, logs);
     command.pipe(passThrough, { end: true });
