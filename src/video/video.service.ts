@@ -26,13 +26,16 @@ export class VideoService implements IVideoProvider {
     const outputOptions = [`-f ${options.container}`, '-movflags +faststart'];
     if (options.codec) outputOptions.push(`-vcodec ${options.codec}`);
     if (options.audioCodec) outputOptions.push(`-acodec ${options.audioCodec}`);
-    if (options.size) outputOptions.push(`-s ${options.size}`);
     if (options.bitrate) outputOptions.push(`-b:v ${options.bitrate}`);
+    if (options.audioBitrate)
+      outputOptions.push(`-b:a ${options.audioBitrate}`);
+    if (options.size) outputOptions.push(`-s ${options.size}`);
     if (options.fps) outputOptions.push(`-r ${options.fps}`);
     if (options.preset) outputOptions.push(`-preset ${options.preset}`);
     if (options.crf) outputOptions.push(`-crf ${options.crf}`);
 
     const command = ffmpeg(stream).outputOptions(outputOptions);
+
     command.pipe(passThrough, { end: true });
 
     return passThrough;

@@ -14,13 +14,14 @@ export interface IVideoProviderConvertOptions {
   container: string;
   codec?: string;
   audioCodec?: string;
+  bitrate?: string;
+  audioBitrate?: string;
   /**
    * WIDTHxHEIGHT
    * @example 1280x720
    */
   size?: string;
-  bitrate?: string | number;
-  fps?: number | string;
+  fps?: number;
   preset?:
     | 'ultrafast'
     | 'superfast'
