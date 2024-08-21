@@ -38,7 +38,16 @@ export class VideoService implements IVideoProvider {
       inputOptions.push(`-analyzeduration ${options.analyzeDuration}`);
     if (options.probeSize) inputOptions.push(`-probesize ${options.probeSize}`);
 
-    const outputOptions = [`-f ${options.container}`, '-movflags +faststart'];
+    const outputOptions = [
+      `-f ${options.container}`,
+      // '-movflags +faststart',
+
+      // 'frag_keyframe', 'empty_moov' for fix output stream video
+      // 'frag_keyframe' allows fragmented output &
+      // 'empty_moov' will cause output to be 100% fragmented; without this the first fragment will be muxed as a short movie (using moov) followed by the rest of the media in fragments.
+      // 'faststart' will move the moov atom to the beginning of the file, which allows you to play a video before it is completely downloaded
+      '-movflags frag_keyframe+empty_moov+faststart',
+    ];
     if (options.codec) outputOptions.push(`-vcodec ${options.codec}`);
     if (options.audioCodec) outputOptions.push(`-acodec ${options.audioCodec}`);
     if (options.bitrate) outputOptions.push(`-b:v ${options.bitrate}`);
@@ -55,6 +64,11 @@ export class VideoService implements IVideoProvider {
 
     this.addLogsOnCommand(command, logs);
 
+    // const outputPath = join(
+    //   __dirname,
+    //   `./converted/video.${options.container}`,
+    // );
+    // command.saveToFile(outputPath);
     command.pipe(passThrough, { end: true });
 
     return passThrough;
