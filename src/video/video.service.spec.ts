@@ -1,5 +1,14 @@
+import { createWriteStream } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { Readable } from 'node:stream';
+
+import { ensureDir } from 'fs-extra';
+
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { MOCK_VIDEOS } from './mock';
+import { IVideoProviderConvertOptions } from './video.provider';
 import { VideoService } from './video.service';
 
 describe('VideoService', () => {
@@ -28,7 +37,7 @@ describe('VideoService', () => {
       ];
 
       for (const path of correctPaths) {
-        const result = await service.isVideoExtension(path);
+        const result = service.isVideoExtension(path);
         expect(result).toBe(true);
       }
     });
@@ -50,4 +59,68 @@ describe('VideoService', () => {
       }
     });
   });
+
+  describe('convert', () => {
+    const codecsByContainer = {
+      mp4: {
+        codec: 'libx264',
+        audioCodec: 'aac',
+      },
+      webm: {
+        codec: 'libvpx-vp9',
+        audioCodec: 'libopus',
+      },
+      avi: {
+        codec: 'libx264',
+        audioCodec: 'aac',
+      },
+    };
+
+    it('should convert the video', async () => {
+      const mockVideo = MOCK_VIDEOS.WithAudio.MP4;
+      const buffer = await readFile(mockVideo.path);
+      const container = 'mp4';
+      const options: IVideoProviderConvertOptions = {
+        container,
+        ...codecsByContainer[container],
+
+        size: '1280x720',
+        crf: 28,
+        preset: 'slow',
+        fps: 20,
+        // bitrate: '1M',
+        analyzeDuration: 2147483647,
+        probeSize: 2147483647,
+      };
+
+      const stream = service.convert(buffer, options, false);
+      expect(stream).toBeDefined();
+      expect(stream).toBeInstanceOf(Readable);
+
+      const outputPath = join(
+        __dirname,
+        `./converted/${generateConvertedVideoFileName(mockVideo.name, options)}`,
+      );
+      await ensureDir(dirname(outputPath));
+
+      const output = createWriteStream(outputPath);
+      stream.pipe(output);
+
+      await new Promise((resolve) => output.on('finish', resolve));
+      expect(output.bytesWritten).toBeGreaterThan(0);
+      expect(output.bytesWritten).toBeLessThan(buffer.byteLength);
+    }, 60000);
+  });
 });
+
+function generateConvertedVideoFileName(
+  fileName: string,
+  options: IVideoProviderConvertOptions,
+) {
+  const { container, ...restOptions } = options;
+
+  const optionsString = Object.entries(restOptions)
+    .map(([key, value]) => `${key}=${value}`)
+    .join('__');
+  return `${fileName}__${optionsString}.${container}`;
+}
