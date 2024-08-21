@@ -43,4 +43,8 @@ export interface IVideoProviderConvertOptions {
    * Низкие значения CRF дают лучшее качество, но увеличивают размер файла, в то время как высокие значения уменьшают качество и размер файла.
    */
   crf?: number;
+  /** max = 2147483647 */
+  analyzeDuration?: number;
+  /** max = 2147483647 */
+  probeSize?: number;
 }

@@ -23,6 +23,11 @@ export class VideoService implements IVideoProvider {
       video instanceof Readable ? video : bufferToStream(Buffer.from(video));
     const passThrough = new PassThrough();
 
+    const inputOptions = [];
+    if (options.analyzeDuration)
+      inputOptions.push(`-analyzeduration ${options.analyzeDuration}`);
+    if (options.probeSize) inputOptions.push(`-probesize ${options.probeSize}`);
+
     const outputOptions = [`-f ${options.container}`, '-movflags +faststart'];
     if (options.codec) outputOptions.push(`-vcodec ${options.codec}`);
     if (options.audioCodec) outputOptions.push(`-acodec ${options.audioCodec}`);
@@ -34,7 +39,10 @@ export class VideoService implements IVideoProvider {
     if (options.preset) outputOptions.push(`-preset ${options.preset}`);
     if (options.crf) outputOptions.push(`-crf ${options.crf}`);
 
-    const command = ffmpeg(stream).outputOptions(outputOptions);
+    const command = ffmpeg(stream)
+      .inputOptions(inputOptions)
+      .outputOptions(outputOptions);
+
     command.pipe(passThrough, { end: true });
 
     return passThrough;
