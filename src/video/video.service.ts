@@ -16,7 +16,7 @@ export class VideoService implements IVideoProvider {
   }
 
   convert(
-    video: Buffer | ArrayBuffer | Uint8Array | Readable,
+    video: string | Buffer | ArrayBuffer | Uint8Array | Readable,
     options: IVideoProviderConvertOptions,
     logs?:
       | boolean
@@ -29,8 +29,7 @@ export class VideoService implements IVideoProvider {
           end?: boolean;
         },
   ): Readable {
-    const stream =
-      video instanceof Readable ? video : bufferToStream(Buffer.from(video));
+    const input = this.getCorrectFfmpegVideoInput(video);
     const passThrough = new PassThrough();
 
     const inputOptions = [];
@@ -59,20 +58,21 @@ export class VideoService implements IVideoProvider {
     if (options.crf) outputOptions.push(`-crf ${options.crf}`);
     if (options.pixFmt) outputOptions.push(`-pix_fmt ${options.pixFmt}`);
 
-    const command = ffmpeg(stream)
+    const command = ffmpeg(input)
       .inputOptions(inputOptions)
       .outputOptions(outputOptions);
 
     this.addLogsOnCommand(command, logs);
-
-    // const outputPath = join(
-    //   __dirname,
-    //   `./converted/video.${options.container}`,
-    // );
-    // command.saveToFile(outputPath);
     command.pipe(passThrough, { end: true });
 
     return passThrough;
+  }
+
+  private getCorrectFfmpegVideoInput(
+    video: string | Buffer | ArrayBuffer | Uint8Array | Readable,
+  ): string | Readable {
+    if (typeof video === 'string' || video instanceof Readable) return video;
+    return bufferToStream(Buffer.from(video));
   }
 
   private addLogsOnCommand(

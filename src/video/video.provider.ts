@@ -5,7 +5,7 @@ export const VIDEO_PROVIDER_KEY = 'VIDEO_PROVIDER';
 export interface IVideoProvider {
   isVideoExtension(path: string): boolean;
   convert(
-    video: Buffer | ArrayBuffer | Uint8Array | Readable,
+    video: string | Buffer | ArrayBuffer | Uint8Array | Readable,
     options: IVideoProviderConvertOptions,
     logs?:
       | boolean
