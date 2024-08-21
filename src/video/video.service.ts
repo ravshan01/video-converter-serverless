@@ -18,6 +18,16 @@ export class VideoService implements IVideoProvider {
   convert(
     video: Buffer | ArrayBuffer | Uint8Array | Readable,
     options: IVideoProviderConvertOptions,
+    logs?:
+      | boolean
+      | {
+          start?: boolean;
+          progress?: boolean;
+          codecData?: boolean;
+          error?: boolean;
+          stderr?: boolean;
+          end?: boolean;
+        },
   ): Readable {
     const stream =
       video instanceof Readable ? video : bufferToStream(Buffer.from(video));
@@ -43,8 +53,59 @@ export class VideoService implements IVideoProvider {
       .inputOptions(inputOptions)
       .outputOptions(outputOptions);
 
+    this.addLogsOnCommand(command, logs);
+
     command.pipe(passThrough, { end: true });
 
     return passThrough;
+  }
+
+  private addLogsOnCommand(
+    command: ffmpeg.FfmpegCommand,
+    logs:
+      | boolean
+      | {
+          start?: boolean;
+          progress?: boolean;
+          codecData?: boolean;
+          error?: boolean;
+          stderr?: boolean;
+          end?: boolean;
+        },
+  ) {
+    if (!logs) return;
+
+    if (logs === true || logs.start) {
+      command.on('start', (commandLine) => {
+        console.log(
+          'VideoService.convert. Spawned Ffmpeg with command: ' + commandLine,
+        );
+      });
+    }
+    if (logs === true || logs.progress) {
+      command.on('progress', (progress) => {
+        console.log('VideoService.convert. Progress', progress);
+      });
+    }
+    if (logs === true || logs.codecData) {
+      command.on('codecData', (data) => {
+        console.log('VideoService.convert, codecData', data);
+      });
+    }
+    if (logs === true || logs.error) {
+      command.on('error', (err) => {
+        console.error('VideoService.convert. Error: ' + err.message);
+      });
+    }
+    if (logs === true || logs.stderr) {
+      command.on('stderr', (stderrLine) => {
+        console.log('VideoService.convert. Stderr output: ' + stderrLine);
+      });
+    }
+    if (logs === true || logs.end) {
+      command.on('end', () => {
+        console.log('VideoService.convert. Finished');
+      });
+    }
   }
 }

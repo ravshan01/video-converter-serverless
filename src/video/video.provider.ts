@@ -7,6 +7,16 @@ export interface IVideoProvider {
   convert(
     video: Buffer | ArrayBuffer | Uint8Array | Readable,
     options: IVideoProviderConvertOptions,
+    logs?:
+      | boolean
+      | {
+          start?: boolean;
+          progress?: boolean;
+          codecData?: boolean;
+          error?: boolean;
+          stderr?: boolean;
+          end?: boolean;
+        },
   ): Readable;
 }
 
