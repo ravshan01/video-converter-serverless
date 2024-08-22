@@ -37,6 +37,12 @@ export interface IVideoProviderConvertOptions {
    */
   scale?: string;
   fps?: number;
+  /**
+   * preset в ffmpeg используется для управления скоростью кодирования и качеством видео
+   * preset влияет на компромисс между скоростью кодирования и качеством/размером видео.
+   * ultrafast — наименьшее время кодирования, но наибольший размер файла.
+   * veryslow — наибольшее время кодирования, но наименьший размер файла.
+   */
   preset?:
     | 'ultrafast'
     | 'superfast'
