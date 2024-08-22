@@ -48,6 +48,7 @@ export class VideoService implements IVideoProvider {
     if (options.bitrate) command.videoBitrate(options.bitrate); // -b:v ${options.bitrate}
     if (options.audioBitrate) command.audioBitrate(options.audioBitrate); // -b:a ${options.audioBitrate}
     if (options.size) command.size(options.size); // -s ${options.size}
+    if (options.scale) command.outputOption([`-vf scale=${options.scale}`]);
     if (options.fps) command.fps(options.fps); // -r ${options.fps}
     if (options.preset) command.outputOption(`-preset ${options.preset}`);
     if (options.crf) command.outputOption(`-crf ${options.crf}`);

@@ -31,6 +31,11 @@ export interface IVideoProviderConvertOptions {
    * @example 1280x720
    */
   size?: string;
+  /**
+   * iw*int:ih*int
+   * @example iw*0.5:ih*0.5
+   */
+  scale?: string;
   fps?: number;
   preset?:
     | 'ultrafast'
