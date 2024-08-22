@@ -88,6 +88,7 @@ describe('VideoService', () => {
         ...codecsByContainer[container],
 
         // size: '1280x720',
+        // scale: 'iw*0.5:ih*0.5',
         crf: 30,
         preset: 'slow',
         fps: 20,
