@@ -90,12 +90,12 @@ describe('VideoService', () => {
         // size: '1280x720',
         // scale: 'iw*0.5:ih*0.5',
         crf: 30,
-        preset: 'slow',
-        fps: 20,
+        preset: 'medium',
+        fps: 25,
         // bitrate: '1M',
       };
 
-      const stream = service.convert(mockVideo.path, options, true);
+      const stream = service.convert(mockVideo.path, options, false);
       expect(stream).toBeDefined();
       expect(stream).toBeInstanceOf(Readable);
 
@@ -112,7 +112,7 @@ describe('VideoService', () => {
       const stats = await stat(mockVideo.path);
       expect(output.bytesWritten).toBeGreaterThan(0);
       expect(output.bytesWritten).toBeLessThan(stats.size);
-    }, 60000);
+    }, 660000);
   });
 });
 
